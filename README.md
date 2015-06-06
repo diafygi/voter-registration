@@ -4,7 +4,7 @@
 
 Demo (doesn't work yet): https://diafygi.github.io/voter-registration/
 
-This project is a mobile application that lets people register
+This project is a mobile application that helps people register
 to vote in California. It is made by volunteers for the League
 of Women Voters, Berkeley Albany Emeryville chapter.
 
