@@ -16,7 +16,7 @@ California:
 1. If you have a California Drivers License or state ID *that
 has your current address*, you can register to vote online!
 This app will link you to the online voter registration form at
-(http://registertovote.ca.gov/)[http://registertovote.ca.gov/].
+[http://registertovote.ca.gov/](http://registertovote.ca.gov/).
 
 2. If you don't have one of the IDs above or your address on
 your ID doesn't match your current address, **that's okay**, you
