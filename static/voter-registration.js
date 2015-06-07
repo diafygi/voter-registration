@@ -214,7 +214,7 @@ function toggleForm(e){
     else{
         mw.className = "map-tall";
         go.innerHTML = "Request Voter Form";
-        document.getElementById("menu").style.maxHeight = "50px";
+        document.getElementById("menu").style.maxHeight = null;
         document.getElementById("form-wrapper").style.display = "none";
     }
 }
