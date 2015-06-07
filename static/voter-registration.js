@@ -156,12 +156,35 @@ function updatePin(e){
     return countyIndex;
 }
 
+//update the popup contents
+function updatePopup(countyIndex, show){
+    var popup = pin.getPopup();
+    if(popup === undefined){
+        popup = new L.popup();
+    }
+    var content = document.createElement("p");
+    content.appendChild(document.createTextNode(countyGeo[countyIndex].properties.NAMELSAD));
+    popup.setContent(content.innerHTML);
+    pin.unbindPopup();
+    pin.bindPopup(popup, {offset: L.point(0, -35)});
+    pin.on("click", function(e){pin.openPopup();});
+}
+
 function updateDropdown(e){
+
+    //update the dropdown
     var dd = document.getElementById("dropdown");
     var newIndex = updatePin(e);
     var currentIndex = dd.selectedIndex - 1;
     if(newIndex !== null && newIndex !== currentIndex){
         dd.value = "" + newIndex;
+        updatePopup(newIndex);
+    }
+    if(newIndex !== null){
+        pin.openPopup();
+    }
+    else{
+        pin.closePopup();
     }
 }
 
@@ -203,8 +226,10 @@ function changeCounty(e){
                 midLat = polys[closestXY][1];
             }
 
-            //update the pin
+            //update the pin and popup
             updatePin({latlng: new L.latLng(midLat, midLng)});
+            updatePopup(countyIndex);
+            pin.openPopup();
         }
     }
 }
@@ -246,7 +271,7 @@ function loadCountyData(){
             pin.on("dragend", updateDropdown);
             map.on("click", updateDropdown);
             pin.addTo(map);
-            updatePin({latlng: new L.latLng(defaultLatLng[0], defaultLatLng[1])});
+            //updatePin({latlng: new L.latLng(defaultLatLng[0], defaultLatLng[1])});
 
             //Initialize the dropdown
             var dd = document.getElementById("dropdown");

@@ -16,16 +16,19 @@
             article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display:block;} body {line-height: 1;} ol, ul {list-style: none;}
             blockquote, q {quotes: none;} blockquote:before, blockquote:after, q:before, q:after {content:''; content:none;} table {border-collapse:collapse; border-spacing:0;}
 
-            html{height:100%;font-family:sans-serif;font-size:15px;}
+            html{height:100%;font-family:sans-serif;font-size:20px;}
             body{height:100%;}
             table{height:100%;width:100%;}
             #map-wrapper{height:100%;}
-            #nav-wrapper td{padding:10px;text-align:center;}
             #map{height:100%;}
+            #nav-wrapper td{padding:10px;text-align:center;}
+            #menu{line-height:30px;}
+            select{font-size:20px;}
         </style>
     </head>
     <body>
-            <table>
+        <input id="search"/>
+        <table>
             <tr id="map-wrapper">
                 <td id="map"></td>
             </tr>
@@ -44,9 +47,9 @@
         <script src="static/voter-registration.js"></script>
         <script>
             //Leaflet map init
-            var defaultLatLng = [37.78746242830388, -122.39666998386383]; //Hackathon location
+            var defaultLatLng = [37, -120];
             var pin = new L.marker(defaultLatLng, {draggable: true});
-            var map = L.map('map').setView(defaultLatLng, 10);
+            var map = L.map("map").setView(defaultLatLng, 5);
             L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
                 attribution: "&copy; <a href='http://www.openstreetmap.org/copyright' target='_blank'>OpenStreetMap</a>"
             }).addTo(map);
