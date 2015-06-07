@@ -165,6 +165,7 @@ function updateDropdown(e){
     var currentIndex = dd.selectedIndex - 1;
     if(newIndex !== null && newIndex !== currentIndex){
         dd.value = "" + newIndex;
+        updateFormName();
     }
     if(newIndex !== null){
         document.getElementById("go").disabled = false;
@@ -202,15 +203,18 @@ function changeCounty(e){
             document.getElementById("go").disabled = false;
         }
     }
+    updateFormName();
 }
 
 function toggleForm(e){
+    //shrink the map and show the request form
     var mw = document.getElementById("map-wrapper");
     var go = document.getElementById("go");
     if(mw.className === "map-start" || mw.className === "map-tall"){
         mw.className = "map-short";
         go.innerHTML = "Hide Voter Form";
     }
+    //hide the form and show the full map
     else{
         mw.className = "map-tall";
         go.innerHTML = "Request Voter Form";
@@ -220,16 +224,88 @@ function toggleForm(e){
 }
 
 function rezoomMap(e){
+    //clean up after shrinking/growing the map
     if(e.target.className === "map-short" || e.target.className === "map-tall"){
         map.setView(pin.getLatLng());
         map.invalidateSize(true);
         if(e.target.className === "map-short"){
             document.getElementById("menu").style.maxHeight = document.getElementById("nav-wrapper").offsetHeight + "px";
             document.getElementById("form-wrapper").style.display = "block";
-            document.getElementById("form-wrapper").checked = false;
+            document.getElementById("confirm").checked = false;
         }
     }
 }
+
+function updateFormName(){
+
+    //update the request form to show the current county name
+    var dd = document.getElementById("dropdown");
+    if(dd.selectedIndex > 0){
+        document.getElementById("blank-state").style.display = "none";
+        document.getElementById("form").style.display = "inline-block";
+        var ddName = dd.options[dd.selectedIndex].text;
+        document.getElementById("confirm-name").innerHTML = ddName;
+    }
+
+    //handle when no selected county
+    else{
+        document.getElementById("blank-state").style.display = "inline-block";
+        document.getElementById("form").style.display = "none";
+    }
+}
+
+function submitForm(e){
+    //submit state
+    document.getElementById("request").removeEventListener("click", submitForm);
+    document.getElementById("request").disabled = true;
+    document.getElementById("request").innerHTML = "Submitting...";
+
+    //get form details
+    var fields = {
+        fullname: document.getElementById("fullname").value.replace(/^\s+|\s+$/g, ""),
+        address1: document.getElementById("address1").value.replace(/^\s+|\s+$/g, ""),
+        address2: document.getElementById("address2").value.replace(/^\s+|\s+$/g, ""),
+        city: document.getElementById("city").value.replace(/^\s+|\s+$/g, ""),
+        state: document.getElementById("state").value.replace(/^\s+|\s+$/g, ""),
+        zip: document.getElementById("zip").value.replace(/^\s+|\s+$/g, ""),
+        phone: document.getElementById("phone").value.replace(/^\s+|\s+$/g, ""),
+        email: document.getElementById("email").value.replace(/^\s+|\s+$/g, ""),
+    }
+
+    //make sure they aren't blank
+    var errors = [];
+    for(var k in fields){
+        if(k === "address2") continue; //skip optional address2
+        if(fields[k] === ""){
+            errors.push((k === "address1"?"address":k) + " is required");
+        }
+    }
+
+    //make sure the checkbox is checked
+    if(!document.getElementById("confirm").checked){
+        errors.push("You need to check the box.");
+    }
+
+    //show an error
+    if(errors.length > 0){
+        var error_msg = "";
+        for(var i = 0; i < errors.length; i++){
+            error_msg += "* " + errors[i] + "\n";
+        }
+        alert(error_msg);
+
+        //re-enable submission button
+        document.getElementById("request").addEventListener("click", submitForm);
+        document.getElementById("request").disabled = false;
+        document.getElementById("request").innerHTML = "Submit Request";
+    }
+
+    //submit the form
+    else{
+        console.log("fields", fields);
+    }
+}
+
 
 function loadCountyData(){
         //Load state border
@@ -290,6 +366,10 @@ function loadCountyData(){
             gobtn.disabled = true;
             gobtn.addEventListener("click", toggleForm);
             document.getElementById("map-wrapper").addEventListener("transitionend", rezoomMap);
+
+            //Initialize the form
+            document.getElementById("request").addEventListener("click", submitForm);
+            document.getElementById("request").disabled = false;
         };
         xhr.send();
 

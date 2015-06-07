@@ -29,8 +29,9 @@
             #dropdown{display:inline-block;margin-top:10px;font-size:20px;}
             #go{display:inline-block;margin-top:10px;font-size:20px;}
             #form-wrapper{width:100%;text-align:center;height:100%;}
+            #form-wrapper p{font-size:16px;margin:20px 0px;}
+            #blank-state{display:inline-block;width:100%;max-width:500px;text-align:left;padding:20px;box-sizing:border-box;}
             #form{display:inline-block;width:100%;max-width:500px;text-align:left;padding:20px;box-sizing:border-box;}
-            #form p{font-size:16px;margin:20px 0px;}
             #form input{font-size:20px;padding:5px 8px;}
             #form select{font-size:20px;padding:5px 8px;}
             #form .input-group{margin:20px 0px;}
@@ -66,7 +67,16 @@
                             </select>
                             <button type="button" id="go" disabled>Request Voter Form</button>
                             <div id="form-wrapper" style="display:none;">
-                                <div id="form">
+                                <div id="blank-state" style="display:none;">
+                                    <p>
+                                        You need to select your county to request a voter registration form.
+                                    </p>
+                                    <p>
+                                        Have a California Drivers License or ID with your current address?
+                                        <a href="http://registertovote.ca.gov/">Register Online!</a>
+                                    </p>
+                                </div>
+                                <div id="form" style="display:none;">
                                     <p>Request a voter registration form be mailed to you!</p>
                                     <div class="input-group">
                                         <label for="fullname">Full Name:</label>
@@ -75,7 +85,7 @@
                                         </div>
                                     </div>
                                     <div class="input-group">
-                                        <label for="address">Address:</label>
+                                        <label for="address1">Address:</label>
                                         <div class="label-group">
                                             <div class="input-wrapper">
                                                 <input id="address1" placeholder="(e.g. 1225 Fallon Street)"/>
