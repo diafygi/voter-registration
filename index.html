@@ -16,12 +16,31 @@
             article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display:block;} body {line-height: 1;} ol, ul {list-style: none;}
             blockquote, q {quotes: none;} blockquote:before, blockquote:after, q:before, q:after {content:''; content:none;} table {border-collapse:collapse; border-spacing:0;}
 
-            html,body{height:100%;}
+            html{height:100%;font-family:sans-serif;font-size:15px;}
+            body{height:100%;}
+            table{height:100%;width:100%;}
+            #map-wrapper{height:100%;}
+            #nav-wrapper td{padding:10px;text-align:center;}
             #map{height:100%;}
         </style>
     </head>
     <body>
-        <div id="map"></div>
+            <table>
+            <tr id="map-wrapper">
+                <td id="map"></td>
+            </tr>
+            <tr id="nav-wrapper">
+                <td id="nav">
+                    <div id="loading">Loading...</div>
+                    <div id="menu" style="display:none;">
+                        Find your home or
+                        <select id="dropdown">
+                            <option value="-1">Select County</option>
+                        </select>
+                    </div>
+                </td>
+            </tr>
+        </table>
         <script src="static/voter-registration.js"></script>
         <script>
             //Leaflet map init
@@ -31,41 +50,7 @@
             L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
                 attribution: "&copy; <a href='http://www.openstreetmap.org/copyright' target='_blank'>OpenStreetMap</a>"
             }).addTo(map);
-
-            //Load state border
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", "static/geojson/tiger2014.state.ca.geo.json");
-            xhr.overrideMimeType("application/json");
-            xhr.onload = function(){
-                var ca = L.GeoJSON.geometryToLayer(JSON.parse(this.responseText).features[0]);
-                ca.setStyle({
-                    color: "#F95252",
-                    opacity: 0.5,
-                    fill: false,
-                });
-                map.addLayer(ca);
-            };
-            xhr.send();
-
-            //Load counties
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", "static/geojson/tiger2014.county.ca.geo.json");
-            xhr.overrideMimeType("application/json");
-            xhr.onload = function(){
-                //Parse counties
-                countyGeo = JSON.parse(this.responseText).features;
-                for(var i = 0; i < countyGeo.length; i++)
-                    addBoxes(countyGeo[i]);
-
-                //Initialize the pin
-                pin.on("drag", updatePin);
-                pin.on("dragend", updatePin);
-                map.on("click", updatePin);
-                pin.addTo(map);
-                updatePin({latlng: new L.latLng(defaultLatLng[0], defaultLatLng[1])});
-
-            };
-            xhr.send();
+            loadCountyData();
         </script>
     </body>
 </html>

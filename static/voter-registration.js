@@ -9,20 +9,18 @@ var countyLayers = {active: {}, cached: {}};
 function addBoxes(feature){
 
     //add boundaryBoxes to the feature's properties
-    feature.properties.boundaryBoxes = [];
     var polys = feature.geometry.type === "MultiPolygon" ? feature.geometry.coordinates : [feature.geometry.coordinates];
 
+    //default boundaryBox is inverse infinity box
+    var bbox = [
+        [ 179.999999, -89.999999], //northwest corner
+        [-179.999999, -89.999999], //northeast corner
+        [-179.999999,  89.999999], //southeast corner
+        [ 179.999999,  89.999999], //southwest corner
+    ];
+
+    //find the boundary coordinates for all of the polygons
     for(var p = 0; p < polys.length; p++){
-
-        //default boundaryBox is inverse infinity box
-        var bbox = [
-            [ 179.999999, -89.999999], //northwest corner
-            [-179.999999, -89.999999], //northeast corner
-            [-179.999999,  89.999999], //southeast corner
-            [ 179.999999,  89.999999], //southwest corner
-        ];
-
-        //find the boundary coordinates for this polygon's box
         for(var i = 0; i < polys[p][0].length; i++){
 
             //longitude west edge
@@ -41,8 +39,9 @@ function addBoxes(feature){
             if ((bbox[2][1]+90.0)%180.0 > (polys[p][0][i][1]+90.0)%180.0)
                 bbox[2][1] = bbox[3][1] = polys[p][0][i][1];
         }
-        feature.properties.boundaryBoxes.push(bbox);
     }
+
+    feature.properties['boundaryBoxes'] = bbox;
 
     return feature;
 };
@@ -54,11 +53,12 @@ function addBoxes(feature){
 function isInside(xy, feature){
     var polys = feature.geometry.type === "MultiPolygon" ? feature.geometry.coordinates : [feature.geometry.coordinates];
     var insidePoly = false;
-    var i = 0;
-    while (i < polys.length && !insidePoly) {
 
-        // check if in boundaryBox
-        if(inRing(xy, feature.properties.boundaryBoxes[i])){
+    // check if in overall boundaryBox
+    if(inRing(xy, feature.properties.boundaryBoxes)){
+
+        var i = 0;
+        while (i < polys.length && !insidePoly){
 
             // check if it is in the outer ring
             if(inRing(xy, polys[i][0])){
@@ -74,8 +74,8 @@ function isInside(xy, feature){
                 if(!inHole)
                     insidePoly = true;
             }
+            i++;
         }
-        i++;
     }
     return insidePoly;
 }
@@ -141,9 +141,6 @@ function updatePin(e){
                 countyLayers.active[countyIndex].on("click", updatePin);
                 map.addLayer(countyLayers.active[countyIndex]);
             }
-
-            //update the county name
-            console.log(countyGeo[countyIndex].properties.NAMELSAD);
         }
     }
 
@@ -155,6 +152,114 @@ function updatePin(e){
             delete countyLayers.active[l];
         }
     }
+
+    return countyIndex;
 }
 
+function updateDropdown(e){
+    var dd = document.getElementById("dropdown");
+    var newIndex = updatePin(e);
+    var currentIndex = dd.selectedIndex - 1;
+    if(newIndex !== null && newIndex !== currentIndex){
+        dd.value = "" + newIndex;
+    }
+}
+
+function changeCounty(e){
+    //make sure the target county is not selected
+    if(e.target.selectedIndex > 0){
+        var countyIndex = e.target.selectedIndex - 1;
+        if(countyLayers.active[countyIndex] === undefined){
+            var county = countyGeo[countyIndex];
+            var bbox = county.properties.boundaryBoxes;
+
+            //move the map to center on the county
+            map.fitBounds([
+                [bbox[3][1], bbox[3][0]], //southwest point
+                [bbox[1][1], bbox[1][0]], //northeast point
+            ]);
+
+            //find a point in the county
+            var midLat = ((bbox[1][1]+90.0 + bbox[3][1]+90.0) / 2) - 90.0;
+            var midLng = ((bbox[1][0]+180.0 + bbox[3][0]+180.0) / 2) - 180.0;
+
+            //move the midpoint to a location inside the county
+            if(!isInside([midLng, midLat], county)){
+
+                //find the closest point
+                var polys = county.geometry.type === "MultiPolygon" ? county.geometry.coordinates[0][0] : county.geometry.coordinates[0];
+                var closestXY = 0;
+                var closestDist = Math.pow(Math.pow(polys[closestXY][0]-midLng, 2) + Math.pow(polys[closestXY][1]-midLat, 2), 0.5);
+                for(var i = 1; i < polys.length; i++){
+                    var x = polys[i][0];
+                    var y = polys[i][1];
+                    var dist = Math.pow(Math.pow(x-midLng, 2) + Math.pow(y-midLat, 2), 0.5);
+                    if(closestDist > dist){
+                        closestXY = i;
+                        closestDist = dist;
+                    }
+                }
+                midLng = polys[closestXY][0];
+                midLat = polys[closestXY][1];
+            }
+
+            //update the pin
+            updatePin({latlng: new L.latLng(midLat, midLng)});
+        }
+    }
+}
+
+function loadCountyData(){
+        //Load state border
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "static/geojson/tiger2014.state.ca.geo.json");
+        xhr.overrideMimeType("application/json");
+        xhr.onload = function(){
+            var ca = L.GeoJSON.geometryToLayer(JSON.parse(this.responseText).features[0]);
+            ca.setStyle({
+                color: "#F95252",
+                opacity: 0.5,
+                fill: false,
+            });
+            map.addLayer(ca);
+        };
+        xhr.send();
+
+        //Load counties
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "static/geojson/tiger2014.county.ca.geo.json");
+        xhr.overrideMimeType("application/json");
+        xhr.onload = function(){
+            //Parse counties
+            countyGeo = JSON.parse(this.responseText).features;
+            for(var i = 0; i < countyGeo.length; i++){
+                addBoxes(countyGeo[i]);
+            }
+
+            //sort alphabetically
+            countyGeo.sort(function(a, b){
+                return a.properties.NAMELSAD.toLowerCase().localeCompare(b.properties.NAMELSAD, "en", {sensitivity: "base"});
+            });
+
+            //Initialize the pin
+            pin.on("drag", updatePin);
+            pin.on("dragend", updateDropdown);
+            map.on("click", updateDropdown);
+            pin.addTo(map);
+            updatePin({latlng: new L.latLng(defaultLatLng[0], defaultLatLng[1])});
+
+            //Initialize the dropdown
+            var dd = document.getElementById("dropdown");
+            for(var i = 0; i < countyGeo.length; i++){
+                var option = document.createElement("option");
+                option.value = i+"";
+                option.appendChild(document.createTextNode(countyGeo[i].properties.NAMELSAD));
+                dd.appendChild(option);
+            }
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("menu").style.display = "block";
+            dd.addEventListener("change", changeCounty);
+        };
+        xhr.send();
+}
 
