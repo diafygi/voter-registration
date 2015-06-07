@@ -181,12 +181,16 @@ function updateDropdown(e){
         //updatePopup(newIndex);
     }
     if(newIndex !== null){
+        document.getElementById("go").disabled = false;
         //pin.openPopup();
     }
     else{
         dd.value = "-1";
+        document.getElementById("go").disabled = true;
         //pin.closePopup();
     }
+
+    return newIndex;
 }
 
 function changeCounty(e){
@@ -229,9 +233,30 @@ function changeCounty(e){
 
             //update the pin and popup
             updatePin({latlng: new L.latLng(midLat, midLng)});
+            document.getElementById("go").disabled = false;
             //updatePopup(countyIndex);
             //pin.openPopup();
         }
+    }
+}
+
+function toggleForm(e){
+    var mw = document.getElementById("map-wrapper");
+    var go = document.getElementById("go");
+    if(mw.className === "map-start" || mw.className === "map-tall"){
+        mw.className = "map-short";
+        go.innerHTML = "Hide Voter Form";
+    }
+    else{
+        mw.className = "map-tall";
+        go.innerHTML = "Request Voter Form";
+    }
+}
+
+function rezoomMap(e){
+    if(e.target.className === "map-short" || e.target.className === "map-tall"){
+        map.setView(pin.getLatLng());
+        map.invalidateSize(true);
     }
 }
 
@@ -284,8 +309,14 @@ function loadCountyData(){
             }
             document.getElementById("loading").style.display = "none";
             document.getElementById("menu").style.display = "block";
+            dd.value = "-1";
             dd.addEventListener("change", changeCounty);
 
+            //Initialize request form toggle
+            var gobtn = document.getElementById("go");
+            gobtn.disabled = true;
+            gobtn.addEventListener("click", toggleForm);
+            document.getElementById("map-wrapper").addEventListener("transitionend", rezoomMap);
         };
         xhr.send();
 
@@ -293,8 +324,14 @@ function loadCountyData(){
         function showPosition(position){
             if(countyGeo){
                 var ll = new L.latLng(position.coords.latitude, position.coords.longitude);
-                updateDropdown({latlng: ll});
-                map.setView(ll, 14);
+                var newIndex = updateDropdown({latlng: ll});
+                if(newIndex !== null){
+                    map.setView(ll, 14);
+                    toggleForm();
+                }
+                else{
+                    map.setView(ll);
+                }
             }
             else{
                 setTimeout(showPosition, 300, position);

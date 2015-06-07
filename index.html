@@ -19,8 +19,9 @@
             html{height:100%;font-family:sans-serif;font-size:20px;}
             body{height:100%;}
             table{height:100%;width:100%;}
-            #map-wrapper{height:100%;}
-            #map{height:100%;}
+            .map-start{height:100%;}
+            .map-tall{height:100%;transition: height 0.5s ease;}
+            .map-short{height:30%;transition: height 0.5s ease;}
             #nav-wrapper td{padding:10px;text-align:center;}
             #dropdown{display:inline-block;margin-top:10px;font-size:20px;}
             #go{display:inline-block;margin-top:10px;font-size:20px;}
@@ -28,7 +29,7 @@
     </head>
     <body>
         <table>
-            <tr id="map-wrapper">
+            <tr id="map-wrapper" class="map-start">
                 <td id="map"></td>
             </tr>
             <tr id="nav-wrapper">
@@ -39,7 +40,7 @@
                         <select id="dropdown">
                             <option value="-1">Select County</option>
                         </select>
-                        <button id="go" disabled>Request Voter Form</button>
+                        <button type="button" id="go" disabled>Request Voter Form</button>
                     </div>
                 </td>
             </tr>
