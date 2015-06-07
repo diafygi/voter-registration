@@ -106,8 +106,9 @@ function searchFeatures(xy, features){
 function updatePin(e){
 
     //udpate the pin
-    var latlng = e.latlng !== undefined ? e.latlng : e.target.getLatLng();
+    var latlng = map.getCenter();
     pin.setLatLng(latlng);
+    pin.closePopup();
 
     //update the county
     var countyIndex = searchFeatures([latlng.lng, latlng.lat], countyGeo);
@@ -156,38 +157,21 @@ function updatePin(e){
     return countyIndex;
 }
 
-//update the popup contents
-function updatePopup(countyIndex, show){
-    var popup = pin.getPopup();
-    if(popup === undefined){
-        popup = new L.popup();
-    }
-    var content = document.createElement("p");
-    content.appendChild(document.createTextNode(countyGeo[countyIndex].properties.NAMELSAD));
-    popup.setContent(content.innerHTML);
-    pin.unbindPopup();
-    pin.bindPopup(popup, {offset: L.point(0, -35)});
-    pin.on("click", function(e){pin.openPopup();});
-}
-
 function updateDropdown(e){
 
     //update the dropdown
     var dd = document.getElementById("dropdown");
-    var newIndex = updatePin(e);
+    var newIndex = updatePin();
     var currentIndex = dd.selectedIndex - 1;
     if(newIndex !== null && newIndex !== currentIndex){
         dd.value = "" + newIndex;
-        //updatePopup(newIndex);
     }
     if(newIndex !== null){
         document.getElementById("go").disabled = false;
-        //pin.openPopup();
     }
     else{
         dd.value = "-1";
         document.getElementById("go").disabled = true;
-        //pin.closePopup();
     }
 
     return newIndex;
@@ -211,31 +195,9 @@ function changeCounty(e){
             var midLat = ((bbox[1][1]+90.0 + bbox[3][1]+90.0) / 2) - 90.0;
             var midLng = ((bbox[1][0]+180.0 + bbox[3][0]+180.0) / 2) - 180.0;
 
-            //move the midpoint to a location inside the county
-            if(!isInside([midLng, midLat], county)){
-
-                //find the closest point
-                var polys = county.geometry.type === "MultiPolygon" ? county.geometry.coordinates[0][0] : county.geometry.coordinates[0];
-                var closestXY = 0;
-                var closestDist = Math.pow(Math.pow(polys[closestXY][0]-midLng, 2) + Math.pow(polys[closestXY][1]-midLat, 2), 0.5);
-                for(var i = 1; i < polys.length; i++){
-                    var x = polys[i][0];
-                    var y = polys[i][1];
-                    var dist = Math.pow(Math.pow(x-midLng, 2) + Math.pow(y-midLat, 2), 0.5);
-                    if(closestDist > dist){
-                        closestXY = i;
-                        closestDist = dist;
-                    }
-                }
-                midLng = polys[closestXY][0];
-                midLat = polys[closestXY][1];
-            }
-
             //update the pin and popup
-            updatePin({latlng: new L.latLng(midLat, midLng)});
+            updatePin();
             document.getElementById("go").disabled = false;
-            //updatePopup(countyIndex);
-            //pin.openPopup();
         }
     }
 }
@@ -293,11 +255,13 @@ function loadCountyData(){
             });
 
             //Initialize the pin
-            pin.on("drag", updatePin);
-            pin.on("dragend", updateDropdown);
-            map.on("click", updateDropdown);
+            map.on("move", updatePin);
+            map.on("moveend", updateDropdown);
             pin.addTo(map);
             //updatePin({latlng: new L.latLng(defaultLatLng[0], defaultLatLng[1])});
+
+            //create popup
+            pin.bindPopup("Put me on your home!", {offset: L.point(0, -35)}).openPopup();
 
             //Initialize the dropdown
             var dd = document.getElementById("dropdown");
@@ -326,8 +290,7 @@ function loadCountyData(){
                 var ll = new L.latLng(position.coords.latitude, position.coords.longitude);
                 var newIndex = updateDropdown({latlng: ll});
                 if(newIndex !== null){
-                    map.setView(ll, 14);
-                    toggleForm();
+                    map.setView(ll, 12);
                 }
                 else{
                     map.setView(ll);
