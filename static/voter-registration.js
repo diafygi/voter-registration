@@ -286,16 +286,23 @@ function loadCountyData(){
             document.getElementById("menu").style.display = "block";
             dd.addEventListener("change", changeCounty);
 
-            //request location
-            function showPosition(position){
+        };
+        xhr.send();
+
+        //request user's location
+        function showPosition(position){
+            if(countyGeo){
                 var ll = new L.latLng(position.coords.latitude, position.coords.longitude);
                 updateDropdown({latlng: ll});
                 map.setView(ll, 14);
             }
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, function(){}, {enableHighAccuracy: true});
+            else{
+                setTimeout(showPosition, 300, position);
             }
-        };
-        xhr.send();
+        }
+        if(navigator.geolocation){
+            navigator.geolocation.getCurrentPosition(
+                showPosition, function(){}, {enableHighAccuracy: true});
+        }
 }
 
