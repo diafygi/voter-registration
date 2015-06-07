@@ -178,14 +178,14 @@ function updateDropdown(e){
     var currentIndex = dd.selectedIndex - 1;
     if(newIndex !== null && newIndex !== currentIndex){
         dd.value = "" + newIndex;
-        updatePopup(newIndex);
+        //updatePopup(newIndex);
     }
-    if(newIndex !== null){
-        pin.openPopup();
-    }
-    else{
-        pin.closePopup();
-    }
+    //if(newIndex !== null){
+    //    pin.openPopup();
+    //}
+    //else{
+    //    pin.closePopup();
+    //}
 }
 
 function changeCounty(e){
@@ -228,8 +228,8 @@ function changeCounty(e){
 
             //update the pin and popup
             updatePin({latlng: new L.latLng(midLat, midLng)});
-            updatePopup(countyIndex);
-            pin.openPopup();
+            //updatePopup(countyIndex);
+            //pin.openPopup();
         }
     }
 }
