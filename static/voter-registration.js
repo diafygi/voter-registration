@@ -171,7 +171,9 @@ function updateDropdown(e){
     }
     else{
         dd.value = "-1";
-        document.getElementById("go").disabled = true;
+        if(document.getElementById("go").innerHTML === "Request Voter Form"){
+            document.getElementById("go").disabled = true;
+        }
     }
 
     return newIndex;
@@ -212,6 +214,8 @@ function toggleForm(e){
     else{
         mw.className = "map-tall";
         go.innerHTML = "Request Voter Form";
+        document.getElementById("menu").style.maxHeight = "50px";
+        document.getElementById("form-wrapper").style.display = "none";
     }
 }
 
@@ -219,6 +223,11 @@ function rezoomMap(e){
     if(e.target.className === "map-short" || e.target.className === "map-tall"){
         map.setView(pin.getLatLng());
         map.invalidateSize(true);
+        if(e.target.className === "map-short"){
+            document.getElementById("menu").style.maxHeight = document.getElementById("nav-wrapper").offsetHeight + "px";
+            document.getElementById("form-wrapper").style.display = "block";
+            document.getElementById("form-wrapper").checked = false;
+        }
     }
 }
 

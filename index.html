@@ -18,33 +18,113 @@
 
             html{height:100%;font-family:sans-serif;font-size:20px;}
             body{height:100%;}
+            #table-wrapper{height:100%;}
             table{height:100%;width:100%;}
             .map-start{height:100%;}
-            .map-tall{height:100%;transition: height 0.5s ease;}
-            .map-short{height:30%;transition: height 0.5s ease;}
-            #nav-wrapper td{padding:10px;text-align:center;}
+            .map-tall{height:100%;transition: height 0.4s ease;}
+            .map-short{height:20%;transition: height 0.4s ease;}
+            #nav-wrapper td{text-align:center;}
+            #loading{padding:10px 0px;text-align:center;max-height:50px;}
+            #menu{padding:10px 0px;overflow-y:auto;max-height:50px;}
             #dropdown{display:inline-block;margin-top:10px;font-size:20px;}
             #go{display:inline-block;margin-top:10px;font-size:20px;}
+            #form-wrapper{width:100%;text-align:center;height:100%;}
+            #form{display:inline-block;width:100%;max-width:600px;text-align:left;padding:20px;box-sizing:border-box;}
+            #form p{font-size:16px;margin:20px 0px;}
+            #form input{font-size:20px;padding:5px 8px;}
+            #form select{font-size:20px;padding:5px 8px;}
+            #form .input-group{margin:20px 0px;}
+            #form .label-group{display:inline-block;max-width:300px;width:100%;box-sizing:border-box;}
+            #form label{display:inline-block;width:120px;vertical-align:top;margin:10px 0px;}
+            #form .input-wrapper{display:inline-block;width:100%;max-width:300px;box-sizing:border-box;}
+            #form .input-wrapper input{width:100%;box-sizing:border-box;}
+            #form #city{width:100%;max-width:190px;}
+            #form #state{width:100%;max-width:75px;}
+            #form #zip{width:100%;max-width:120px;}
+            #form #confirm{float:left;margin:20px 20px 20px 0px;}
+            #form #confirm-desc{display:inline-block;max-width:80%;padding:0px;margin:20px 0px 0px 0px;}
+            #form #request-wrapper{width:100%;text-align:center;}
+            #form #request{padding:10px 30px;font-size:20px;}
         </style>
     </head>
     <body>
-        <table>
-            <tr id="map-wrapper" class="map-start">
-                <td id="map"></td>
-            </tr>
-            <tr id="nav-wrapper">
-                <td id="nav">
-                    <div id="loading">Loading...</div>
-                    <div id="menu" style="display:none;">
-                        Find your home on the map or
-                        <select id="dropdown">
-                            <option value="-1">Select County</option>
-                        </select>
-                        <button type="button" id="go" disabled>Request Voter Form</button>
-                    </div>
-                </td>
-            </tr>
-        </table>
+        <div id="table-wrapper">
+            <table>
+                <tr id="map-wrapper" class="map-start">
+                    <td id="map"></td>
+                </tr>
+                <tr id="nav-wrapper">
+                    <td id="nav">
+                        <div id="loading">Loading...</div>
+                        <div id="menu" style="display:none;">
+                            Find your home on the map or
+                            <select id="dropdown">
+                                <option value="-1">Select County</option>
+                            </select>
+                            <button type="button" id="go" disabled>Request Voter Form</button>
+                            <div id="form-wrapper" style="display:none;">
+                                <div id="form">
+                                    <p>Request a voter registration form be mailed to you!</p>
+                                    <div class="input-group">
+                                        <label for="fullname">Full Name:</label>
+                                        <div class="input-wrapper">
+                                            <input id="fullname" placeholder="(e.g. Jane Ann Smith)"/>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="address">Address:</label>
+                                        <div class="label-group">
+                                            <div class="input-wrapper">
+                                                <input id="address1" placeholder="(e.g. 1225 Fallon Street)"/>
+                                            </div>
+                                            <div class="input-wrapper">
+                                                <input id="address2" placeholder="(e.g. Apt 101)"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="city">City:</label>
+                                        <div class="label-group">
+                                            <input id="city" placeholder="(e.g. Oakland)"/>,
+                                            <select id="state">
+                                                <option value="CA" selected>CA</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="zip">Zipcode:</label>
+                                        <input id="zip" placeholder="(e.g. 94612)"/>
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="phone">Phone:</label>
+                                        <div class="input-wrapper">
+                                            <input id="phone" placeholder="(e.g. 510-555-8683)"/>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="email">E-mail:</label>
+                                        <div class="input-wrapper">
+                                            <input id="email" placeholder="(e.g. jane@example.com)"/>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <p id="confirm-desc">
+                                            I want
+                                            <span id="confirm-name">Alameda County</span>
+                                            to mail me a voter registration form.
+                                        </p>
+                                        <input id="confirm" type="checkbox"/>
+                                    </div>
+                                    <div id="request-wrapper">
+                                        <button id="request">Submit Request</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
         <script src="static/voter-registration.js"></script>
         <script>
             //Leaflet map init
