@@ -180,12 +180,13 @@ function updateDropdown(e){
         dd.value = "" + newIndex;
         //updatePopup(newIndex);
     }
-    //if(newIndex !== null){
-    //    pin.openPopup();
-    //}
-    //else{
-    //    pin.closePopup();
-    //}
+    if(newIndex !== null){
+        //pin.openPopup();
+    }
+    else{
+        dd.value = "-1";
+        //pin.closePopup();
+    }
 }
 
 function changeCounty(e){
@@ -284,6 +285,16 @@ function loadCountyData(){
             document.getElementById("loading").style.display = "none";
             document.getElementById("menu").style.display = "block";
             dd.addEventListener("change", changeCounty);
+
+            //request location
+            function showPosition(position){
+                var ll = new L.latLng(position.coords.latitude, position.coords.longitude);
+                updateDropdown({latlng: ll});
+                map.setView(ll, 14);
+            }
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, function(){}, {enableHighAccuracy: true});
+            }
         };
         xhr.send();
 }
