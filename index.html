@@ -29,13 +29,16 @@
             #dropdown{display:inline-block;margin-top:10px;font-size:20px;}
             #go{display:inline-block;margin-top:10px;font-size:20px;}
             #form-wrapper{width:100%;text-align:center;height:100%;}
-            #form{display:inline-block;width:100%;max-width:600px;text-align:left;padding:20px;box-sizing:border-box;}
+            #form{display:inline-block;width:100%;max-width:500px;text-align:left;padding:20px;box-sizing:border-box;}
             #form p{font-size:16px;margin:20px 0px;}
             #form input{font-size:20px;padding:5px 8px;}
             #form select{font-size:20px;padding:5px 8px;}
             #form .input-group{margin:20px 0px;}
             #form .label-group{display:inline-block;max-width:300px;width:100%;box-sizing:border-box;}
             #form label{display:inline-block;width:120px;vertical-align:top;margin:10px 0px;}
+            @media (max-width: 500px){
+                #form label{display:block;width:100%;vertical-align:top;margin:10px 0px;}
+            }
             #form .input-wrapper{display:inline-block;width:100%;max-width:300px;box-sizing:border-box;}
             #form .input-wrapper input{width:100%;box-sizing:border-box;}
             #form #city{width:100%;max-width:190px;}
