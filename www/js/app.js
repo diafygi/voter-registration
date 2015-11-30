@@ -28,17 +28,17 @@ angular.module('starter', ['ionic', 'vr.controllers'])
       }
     }
   })
-  .state('app.states', {
-    url: '/states',
+  .state('app.register', {
+    url: '/register',
     views: {
       'menuContent': {
-        templateUrl: 'templates/states.html',
+        templateUrl: 'templates/register.html',
         controller: 'StatesCtrl',
       }
     }
   })
   .state('app.state', {
-    url: '/states/:stateAbv',
+    url: '/register/:stateAbv',
     views: {
       'menuContent': {
         templateUrl: 'templates/state.html',
